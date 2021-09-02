@@ -1,9 +1,11 @@
 import { format } from "date-fns";
 import { useRouter } from "next/dist/client/router";
 import Header from "../components/Header";
+import InfoCard from "../components/InfoCard";
 import Footer from "../containers/footer";
 
-const Search = () => {
+const Search = ({ searchResults }) => {
+  console.log(searchResults);
   const router = useRouter();
   const { location, startDate, endDate, noOfGustes } = router.query;
   const formatedStartDate = format(new Date(startDate), "dd MMMM yy");
@@ -28,11 +30,39 @@ const Search = () => {
             <p className="button">Rooms and Beds</p>
             <p className="button">More filters</p>
           </div>
+
+          <div className="flex flex-col">
+            {searchResults.map(
+              ({ img, location, title, description, star, price, total }) => (
+                <InfoCard
+                  img={img}
+                  location={location}
+                  title={title}
+                  description={description}
+                  star={star}
+                  price={price}
+                  total={total}
+                />
+              )
+            )}
+          </div>
         </section>
       </main>
       <Footer />
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  const searchResults = await fetch("https://links.papareact.com/isz").then(
+    (res) => res.json()
+  );
+
+  return {
+    props: {
+      searchResults,
+    },
+  };
+}
 
 export default Search;
