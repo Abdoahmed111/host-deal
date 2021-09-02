@@ -3,14 +3,43 @@ import {
   GlobeAltIcon,
   MenuIcon,
   UserCircleIcon,
-  UserIcon,
 } from "@heroicons/react/solid";
+import { useRouter } from "next/dist/client/router";
+import { useState } from "react";
+import Calender from "../Calender";
 
-const Header = () => {
+const Header = ({ placeholder }) => {
+  const [searchInput, setSearchInput] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [noOfGustes, setNoOfGustes] = useState(1);
+
+  const router = useRouter();
+
+  const search = () => {
+    router.push({
+      pathname: "/search",
+      query: {
+        location: searchInput,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        noOfGustes,
+      },
+    });
+  };
+
+  const selectionRange = {
+    startDate: startDate,
+    endDate: endDate,
+    key: "selection",
+  };
   return (
     <header className="sticky top-0 z-50 grid grid-cols-3 bg-white shadow-md p-5 md:px-10">
       {/* Left */}
-      <div className="relative flex items-center h-10 cursor-pointer my-auto">
+      <div
+        className="relative flex items-center h-10 cursor-pointer my-auto"
+        onClick={() => router.push("/")}
+      >
         <h3 className="font-mono text-left text-2xl font-bold text-yellow-500">
           HostDeal
         </h3>
@@ -18,9 +47,11 @@ const Header = () => {
       {/* Middle */}
       <div className="flex items-center md:border-2 rounded-full py-2 md:shadow-sm">
         <input
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="pl-5 bg-transparent outline-none flex-grow text-sm text-gray-600 placeholder-gray-400"
           type="text"
-          placeholder="Start Your Search"
+          placeholder={placeholder || "Start your Search"}
         />
         <SearchIcon className="hidden md:inline-flex h-8 bg-yellow-500 rounded-full p-2 text-white cursor-pointer md:mx-2" />
       </div>
@@ -37,6 +68,17 @@ const Header = () => {
           <UserCircleIcon className="h-6" />
         </div>
       </div>
+      {searchInput && (
+        <Calender
+          selectionRange={selectionRange}
+          setEndDate={setEndDate}
+          setStartDate={setStartDate}
+          noOfGustes={noOfGustes}
+          setNoOfGustes={setNoOfGustes}
+          setSearchInput={setSearchInput}
+          handleSearch={search}
+        />
+      )}
     </header>
   );
 };
